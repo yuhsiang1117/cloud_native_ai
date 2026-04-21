@@ -1,0 +1,45 @@
+services:
+  ollama-server:
+    build:
+      context: .
+      target: ollama_server
+      dockerfile: Dockerfile
+    container_name: ollama-server
+    ports:
+      - "11434:11434"
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    privileged: true
+    command: bash -c "ollama serve && ollama run gemma4:e2b"
+    working_dir: /cloud_native_ai
+    # runtime: nvidia
+    # deploy:
+    #   resources:
+    #     reservations:
+    #       devices:
+    #         - driver: nvidia
+    #           count: 1
+    #           capabilities: [gpu]
+    volumes:
+      - ../src/ollama_ws:/ollama_ws
+
+  discord-bot:
+    build:
+      context: .
+      target: discord_bot
+      dockerfile: Dockerfile
+    container_name: discord-bot
+    env_file:
+      - .env
+    restart: unless-stopped
+    stdin_open: true
+    tty: true
+    command: bash -c "python3 bot.py"
+    working_dir: /discord_ws
+    environment:
+      - DISCORD_TOKEN=${DISCORD_TOKEN}
+    volumes:
+      - ../src/discord_ws:/discord_ws
+    depends_on:
+      - ollama-server
