@@ -4,6 +4,7 @@ services:
       context: .
       target: ollama_server
       dockerfile: Dockerfile
+    image: cyhsiang/ollama-server:latest
     container_name: ollama-server
     ports:
       - "11434:11434"
@@ -29,6 +30,7 @@ services:
       context: .
       target: discord_bot
       dockerfile: Dockerfile
+    image: cyhsiang/discord-bot:latest
     container_name: discord-bot
     env_file:
       - .env
